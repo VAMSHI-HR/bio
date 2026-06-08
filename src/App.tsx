@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { 
   Activity, 
   Menu, 
-  Bell, 
   Apple, 
   Clock, 
   PhoneCall
@@ -10,7 +9,6 @@ import {
 
 // Sub-components
 import Sidebar from "./components/Sidebar";
-import Chatbot from "./components/Chatbot";
 import LoginPage from "./components/LoginPage";
 import PredictionForm from "./components/PredictionForm";
 import ResultsView from "./components/ResultsView";
@@ -283,7 +281,7 @@ export default function App() {
         riskPercentage: bRisk,
         confidenceScore: 82,
         severityIndicator: bRisk > 70 ? "High Risk" : bRisk > 35 ? "Medium Risk" : "Low Risk",
-        explanation: `This is a simulated review compiled by fallback math engine. Fasting blood glucose is ${inputs.glucose} mg/dL, cholesterol level is ${inputs.cholesterol} mg/dL, and reported symptoms match the profile of ${predictedDisease}. Please configure a valid Gemini API key to enable live AI analysis.`,
+        explanation: `This is a simulated review compiled by fallback math engine. Fasting blood glucose is ${inputs.glucose} mg/dL, cholesterol level is ${inputs.cholesterol} mg/dL, and reported symptoms match the profile of ${predictedDisease}. Please configure a valid Groq API key to enable live AI analysis.`,
         precautions: precautions,
         biomarkerAnalysis: [
           { name: "Blood Glucose Level", value: `${inputs.glucose} mg/dL`, status: gFloat > 125 ? "Abnormal" : gFloat > 100 ? "Elevated" : "Normal", impact: "Fasting indicators trace potential glycemic processing loads." },
@@ -320,8 +318,6 @@ export default function App() {
           }} 
           darkMode={darkMode} 
         />
-        {/* Floating Chatbot can float anywhere */}
-        <Chatbot darkMode={darkMode} />
       </div>
     );
   }
@@ -369,17 +365,7 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Quick Informative Notification check */}
-            <div className="relative">
-              <button 
-                id="notif-btn"
-                className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded-xl text-slate-600 dark:text-slate-300 relative cursor-pointer hover:bg-slate-100"
-                title="System Operational"
-              >
-                <Bell className="w-4 h-4" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900" />
-              </button>
-            </div>
+            {/* Notification feature removed */}
           </div>
         </header>
 
@@ -592,9 +578,6 @@ export default function App() {
 
         </main>
       </div>
-
-      {/* Floating chatbot assistant wrapper */}
-      <Chatbot darkMode={darkMode} />
     </div>
   );
 }

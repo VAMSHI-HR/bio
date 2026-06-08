@@ -25,26 +25,14 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-// Initialize Gemini Client safely
-let ai: GoogleGenAI | null = null;
-try {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (apiKey) {
-    ai = new GoogleGenAI({
-      apiKey: apiKey,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
-        },
-      },
-    });
-    console.log("Gemini Client successfully initialized.");
-  } else {
-    console.warn("Warning: GEMINI_API_KEY environment variable is not defined. AI functionality will be mocked.");
-  }
-} catch (error) {
-  console.error("Failed to initialize Gemini Client:", error);
+// Initialize Groq key check
+const groqApiKey = process.env.GROQ_API_KEY;
+if (groqApiKey) {
+  console.log("Groq API successfully initialized.");
+} else {
+  console.warn("Warning: GROQ_API_KEY environment variable is not defined. AI functionality will be mocked.");
 }
+
 
 // 1. Prediction API endpoint with DB storage and rules engine backup
 app.post("/api/predict", async (req, res) => {
@@ -78,12 +66,30 @@ app.post("/api/predict", async (req, res) => {
     ...ruleResult
   };
 
-  // If Gemini is configured, use it to perform deep clinical analysis and refine the summary
-  if (ai) {
+  // If Groq is configured, use it to perform deep clinical analysis and refine the summary
+  if (groqApiKey) {
     try {
       const targetDiseaseText = (disease === "General" || disease === "Auto-Detect") 
         ? "Auto-Detect (evaluate the patient's symptoms, custom symptoms, and detailed description to identify the most likely disease condition. You are NOT restricted to the original 5 diseases; you may detect other conditions such as Influenza, COVID-19, Asthma, Hypertension, GERD, Migraine, Dehydration, etc.)" 
         : disease;
+
+      const systemInstruction = `You are a clinical artificial intelligence diagnostics processor. Analyze indicators and output complete and valid structured clinical reports according to the JSON schema. If the target request is 'Auto-Detect', identify which disease is most relevant. You are NOT restricted to the five pre-classified diseases; you can detect ANY likely medical condition (e.g. Influenza Assessment, COVID-19 Prediction, Asthma Assessment, Hypertension Assessment, GERD Prediction, Migraine Assessment, Dehydration Assessment, etc.) followed by 'Assessment' or 'Prediction'. Populate this in the 'diseaseName' output field. Always include standard precautionary disclaimers within the explanation text. You must output a valid JSON object matching the schema:
+{
+  "diseaseName": "Name of the disease Assessment/Prediction",
+  "riskPercentage": 75, // integer 5 to 95
+  "confidenceScore": 88, // integer 70 to 99
+  "severityIndicator": "Low Risk" | "Medium Risk" | "High Risk",
+  "explanation": "in-depth clinical mechanism summary",
+  "precautions": ["precaution 1", "precaution 2", "precaution 3", "precaution 4"],
+  "biomarkerAnalysis": [
+    {
+      "name": "Biomarker name",
+      "value": "Value description",
+      "status": "Normal" | "Elevated" | "Abnormal",
+      "impact": "impact on this disease"
+    }
+  ]
+}`;
 
       const prompt = `Analyze the following patient health metrics and symptoms for assessing risk.
       
@@ -105,60 +111,44 @@ app.post("/api/predict", async (req, res) => {
 
       You are an advanced medical diagnostics expert system. Identify the most likely disease based on symptoms, custom symptom list, free-text description, and biomarkers. Validate the risk and provide a highly professional, encouraging, and educational clinical explanation outlining the biological mechanism of risk, list actionable precautions, and break down each biomarker (Glucose, Cholesterol, age/vitals) explaining its impact on this specific disease risk.`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: prompt,
-        config: {
-          systemInstruction: "You are a clinical artificial intelligence diagnostics processor. Analyze indicators and output complete and valid structured clinical reports according to the JSON schema. If the target request is 'Auto-Detect', identify which disease is most relevant. You are NOT restricted to the five pre-classified diseases; you can detect ANY likely medical condition (e.g. Influenza Assessment, COVID-19 Prediction, Asthma Assessment, Hypertension Assessment, GERD Prediction, Migraine Assessment, Dehydration Assessment, etc.) followed by 'Assessment' or 'Prediction'. Populate this in the 'diseaseName' output field. Always include standard precautionary disclaimers within the explanation text.",
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              diseaseName: { type: Type.STRING, description: "Identified disease name followed by 'Assessment' or 'Prediction', e.g., 'Influenza Assessment', 'COVID-19 Prediction'" },
-              riskPercentage: { type: Type.INTEGER, description: "Risk value between 5 and 95" },
-              confidenceScore: { type: Type.INTEGER, description: "Model diagnostic confidence value between 70 and 99" },
-              severityIndicator: { type: Type.STRING, description: "Must be exactly 'Low Risk', 'Medium Risk', or 'High Risk'" },
-              explanation: { type: Type.STRING, description: "In-depth clinical summary outlining the biological mechanism of risk" },
-              precautions: { 
-                type: Type.ARRAY, 
-                items: { type: Type.STRING }, 
-                description: "At least 4 lifestyle or clinical precautions" 
-              },
-              biomarkerAnalysis: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    name: { type: Type.STRING, description: "E.g., Glucose Level" },
-                    value: { type: Type.STRING, description: "E.g., 140 mg/dL" },
-                    status: { type: Type.STRING, description: "Must be exactly 'Normal', 'Elevated', or 'Abnormal'" },
-                    impact: { type: Type.STRING, description: "Brief explanation of impact" }
-                  },
-                  required: ["name", "value", "status", "impact"]
-                }
-              }
-            },
-            required: ["diseaseName", "riskPercentage", "confidenceScore", "severityIndicator", "explanation", "precautions", "biomarkerAnalysis"]
-          }
-        }
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${groqApiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            { role: "system", content: systemInstruction },
+            { role: "user", content: prompt }
+          ],
+          response_format: { type: "json_object" }
+        })
       });
 
-      const responseText = response.text;
-      if (responseText) {
-        const aiData = JSON.parse(responseText);
-        finalReport = {
-          ...finalReport,
-          diseaseName: aiData.diseaseName || finalReport.diseaseName,
-          riskPercentage: typeof aiData.riskPercentage === "number" ? aiData.riskPercentage : finalReport.riskPercentage,
-          confidenceScore: typeof aiData.confidenceScore === "number" ? aiData.confidenceScore : finalReport.confidenceScore,
-          severityIndicator: aiData.severityIndicator || finalReport.severityIndicator,
-          explanation: aiData.explanation || finalReport.explanation,
-          precautions: aiData.precautions && aiData.precautions.length >= 4 ? aiData.precautions : finalReport.precautions,
-          biomarkerAnalysis: aiData.biomarkerAnalysis || finalReport.biomarkerAnalysis
-        };
+      if (response.ok) {
+        const data = await response.json();
+        const responseText = data.choices[0]?.message?.content;
+        if (responseText) {
+          const aiData = JSON.parse(responseText);
+          finalReport = {
+            ...finalReport,
+            diseaseName: aiData.diseaseName || finalReport.diseaseName,
+            riskPercentage: typeof aiData.riskPercentage === "number" ? aiData.riskPercentage : finalReport.riskPercentage,
+            confidenceScore: typeof aiData.confidenceScore === "number" ? aiData.confidenceScore : finalReport.confidenceScore,
+            severityIndicator: aiData.severityIndicator || finalReport.severityIndicator,
+            explanation: aiData.explanation || finalReport.explanation,
+            precautions: aiData.precautions && aiData.precautions.length >= 4 ? aiData.precautions : finalReport.precautions,
+            biomarkerAnalysis: aiData.biomarkerAnalysis || finalReport.biomarkerAnalysis
+          };
+        }
+      } else {
+        const errText = await response.text();
+        console.error("Groq API prediction failed status:", response.status, errText);
       }
     } catch (aiError) {
-      console.error("Gemini AI API prediction error, fallback to rules engine details:", aiError);
+      console.error("Groq AI API prediction error, fallback to rules engine details:", aiError);
     }
   }
 
@@ -312,10 +302,10 @@ app.post("/api/chat", async (req, res) => {
     return res.status(400).json({ error: "Message content is required." });
   }
 
-  // Fallback if Gemini client is not initialized
-  if (!ai) {
+  // Fallback if Groq key is not configured
+  if (!groqApiKey) {
     return res.json({
-      text: "Hello! I am the MediPredict AI Assistant. I can see you've asked a health-related question. If you configure a valid GEMINI_API_KEY, I can review your disease results, evaluate symptom metrics, and provide specific medical guidance. For now, please consult your healthcare provider or review standard diagnostic guidelines.",
+      text: "Hello! I am the MediPredict AI Assistant. I can see you've asked a health-related question. If you configure a valid GROQ_API_KEY, I can review your disease results, evaluate symptom metrics, and provide specific medical guidance. For now, please consult your healthcare provider or review standard diagnostic guidelines.",
     });
   }
 
@@ -339,20 +329,46 @@ app.post("/api/chat", async (req, res) => {
       }). AI Explanation: ${latestRecord.explanation.slice(0, 300)}...]\n`;
     }
 
-    const chatContext = messages.map((m: any) => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join("\n");
-    const prompt = `${chatContext}\n${contextString}\nHelp the user with their medical query. Maintain a supportive, reassuring, and professional clinical tone. Reference their patient metrics when answering if relevant, but always remind them this is a simulation and they should consult a real provider.`;
+    const groqMessages = [
+      {
+        role: "system",
+        content: "You are MediPredict AI, a friendly, professional, and knowledgeable medical conversational agent. Answer health questions clearly. Avoid giving raw diagnoses, emphasize simulation purposes, and suggest consulting professionals for serious symptoms."
+      },
+      ...messages.map((m: any) => ({
+        role: m.role === 'user' ? 'user' : 'assistant',
+        content: m.content
+      }))
+    ];
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: prompt,
-      config: {
-        systemInstruction: "You are MediPredict AI, a friendly, professional, and knowledgeable medical conversational agent. Answer health questions clearly. Avoid giving raw diagnoses, emphasize simulation purposes, and suggest consulting professionals for serious symptoms.",
-      }
+    if (contextString) {
+      groqMessages.push({
+        role: "user",
+        content: `System Context: ${contextString}\nHelp the user with their medical query. Reference their patient metrics when answering if relevant, but always remind them this is a simulation and they should consult a real provider.`
+      });
+    }
+
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${groqApiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: groqMessages
+      })
     });
 
-    res.json({ text: response.text });
+    if (response.ok) {
+      const data = await response.json();
+      res.json({ text: data.choices[0]?.message?.content || "Sorry, I couldn't generate a response." });
+    } else {
+      const errText = await response.text();
+      console.error("Groq chat API failed status:", response.status, errText);
+      res.status(500).json({ error: "Sorry, I encountered an error with Groq API." });
+    }
   } catch (error) {
-    console.error("Gemini /api/chat error:", error);
+    console.error("Groq /api/chat error:", error);
     res.status(500).json({ error: "Sorry, I encountered an error. Please try again." });
   }
 });

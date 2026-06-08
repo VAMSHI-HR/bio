@@ -498,7 +498,7 @@ export default function PredictionForm({
             <h5 className="text-white font-bold text-xs uppercase mb-3">Model Status</h5>
             <div className="flex items-center justify-between text-[11px] mb-2">
               <span>Predictive Algorithm:</span>
-              <span className="text-emerald-400 font-semibold">Gemini 3.5 Flash</span>
+              <span className="text-emerald-400 font-semibold">Groq Llama 3.3</span>
             </div>
             <div className="flex items-center justify-between text-[11px]">
               <span>Clinical Test Cohort:</span>
