@@ -15,6 +15,9 @@ export interface PredictionResult {
   explanation: string;
   precautions: string[];
   biomarkerAnalysis: Biomarker[];
+  patientName?: string;
+  patientEmail?: string;
+  patientDetails?: PatientInputs;
 }
 
 export interface PatientInputs {

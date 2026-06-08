@@ -115,7 +115,21 @@ export default function App() {
         severityIndicator: resData.severityIndicator || "Low Risk",
         explanation: resData.explanation || "Biomarkers parsed successfully. Fasting indicators sit inside predicted thresholds.",
         precautions: resData.precautions || ["Consult primary practitioner.", "Slightly reduce processed sugar intake."],
-        biomarkerAnalysis: resData.biomarkerAnalysis || []
+        biomarkerAnalysis: resData.biomarkerAnalysis || [],
+        patientName: resData.patientName || patientEmail.split('@')[0],
+        patientEmail: resData.patientEmail || patientEmail,
+        patientDetails: resData.patientDetails || {
+          age: inputs.age,
+          gender: inputs.gender,
+          weight: inputs.weight,
+          height: inputs.height,
+          bloodPressure: inputs.bloodPressure,
+          glucose: inputs.glucose,
+          cholesterol: inputs.cholesterol,
+          symptoms: inputs.symptoms,
+          symptomsDescription: inputs.symptomsDescription,
+          customSymptoms: inputs.customSymptoms
+        }
       };
 
       // Prepend to history tracking, set active report, navigate to results
@@ -286,7 +300,21 @@ export default function App() {
         biomarkerAnalysis: [
           { name: "Blood Glucose Level", value: `${inputs.glucose} mg/dL`, status: gFloat > 125 ? "Abnormal" : gFloat > 100 ? "Elevated" : "Normal", impact: "Fasting indicators trace potential glycemic processing loads." },
           { name: "Serum Lipids", value: `${inputs.cholesterol} mg/dL`, status: cFloat > 200 ? "Abnormal" : "Normal", impact: "High cholesterol values increase arterial vascular blockages risks." }
-        ]
+        ],
+        patientName: patientEmail.split('@')[0],
+        patientEmail: patientEmail,
+        patientDetails: {
+          age: inputs.age,
+          gender: inputs.gender,
+          weight: inputs.weight,
+          height: inputs.height,
+          bloodPressure: inputs.bloodPressure,
+          glucose: inputs.glucose,
+          cholesterol: inputs.cholesterol,
+          symptoms: inputs.symptoms,
+          symptomsDescription: inputs.symptomsDescription,
+          customSymptoms: inputs.customSymptoms
+        }
       };
 
       setHistory(prev => [fallbackReport, ...prev]);

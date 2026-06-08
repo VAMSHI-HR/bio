@@ -12,6 +12,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import { PredictionResult } from "../types";
+import { generatePredictionPdfClient } from "../utils/pdfGeneratorClient";
 
 interface ResultsViewProps {
   report: PredictionResult | null;
@@ -66,33 +67,13 @@ export default function ResultsView({ report, onBackToForm }: ResultsViewProps) 
 
   const SeverityIcon = severityConfig.icon;
 
-  // Create downloadable PDF report via secure POST payload
-  const handleDownloadReport = async () => {
+  // Create downloadable PDF report via secure client-side generator
+  const handleDownloadReport = () => {
     try {
-      const response = await fetch("/api/reports/pdf", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(report)
-      });
-
-      if (!response.ok) {
-        throw new Error("API responded with an error when compiling the PDF.");
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `MediPredict_Report_${report.id}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      generatePredictionPdfClient(report);
     } catch (err) {
       console.error("PDF compile download error:", err);
-      alert("Could not compile PDF report. Please verify connection to the clinical backend server.");
+      alert("Could not compile PDF report client side.");
     }
   };
 
