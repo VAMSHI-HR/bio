@@ -80,7 +80,11 @@ export function generatePredictionPdf(report: IPredictionResult, res: Response) 
   const pBp = report.patientDetails?.bloodPressure || "N/A";
   const pGlu = report.patientDetails?.glucose || "N/A";
   const pChol = report.patientDetails?.cholesterol || "N/A";
-  const pSyms = (report.patientDetails?.symptoms || []).join(", ") || "None reported";
+  const allSymptomsList = [
+    ...(report.patientDetails?.symptoms || []),
+    ...(report.patientDetails?.customSymptoms || [])
+  ];
+  const pSyms = allSymptomsList.join(", ") || "None reported";
 
   // Grid Layout
   doc
@@ -129,30 +133,36 @@ export function generatePredictionPdf(report: IPredictionResult, res: Response) 
     .text(pSyms, 365, doc.y, { width: 180, height: 25 });
 
   // --- METRIC METERS (RISK / CONFIDENCE) ---
-  doc.y = doc.y + 30;
+  const metersY = doc.y + 30;
+  doc.y = metersY;
+
+  // Left Box (Risk)
   doc
-    .rect(50, doc.y, 235, 45)
+    .rect(50, metersY, 235, 45)
     .fill(lightGray);
   doc
     .fillColor(darkNavy)
     .font("Helvetica-Bold")
     .fontSize(8)
-    .text("ASSESSOR RISK ESTIMATE", 60, doc.y + 10)
+    .text("ASSESSOR RISK ESTIMATE", 60, metersY + 10)
     .fontSize(16)
     .fillColor(severityColor)
-    .text(`${report.riskPercentage}%`, 60, doc.y + 20);
+    .text(`${report.riskPercentage}%`, 60, metersY + 20);
 
+  // Right Box (Confidence)
   doc
-    .rect(310, doc.y - 45, 235, 45) // Adjust to line up
+    .rect(310, metersY, 235, 45)
     .fill(lightGray);
   doc
     .fillColor(darkNavy)
     .font("Helvetica-Bold")
     .fontSize(8)
-    .text("AI MODEL ACCURACY CONFIDENCE", 320, doc.y - 35)
+    .text("AI MODEL ACCURACY CONFIDENCE", 320, metersY + 10)
     .fontSize(16)
     .fillColor(mutedBlue)
-    .text(`${report.confidenceScore}% ACC`, 320, doc.y - 25);
+    .text(`${report.confidenceScore}% ACC`, 320, metersY + 20);
+
+  doc.y = metersY + 45;
 
   // --- BIOMARKER BREAKDOWN TABLE ---
   doc.y = doc.y + 15;
@@ -179,7 +189,7 @@ export function generatePredictionPdf(report: IPredictionResult, res: Response) 
   doc.moveTo(50, doc.y + 8).lineTo(545, doc.y + 8).strokeColor(lineDivider).lineWidth(0.5).stroke();
   
   // Table Rows
-  report.biomarkerAnalysis.forEach((bio) => {
+  (report.biomarkerAnalysis || []).forEach((bio) => {
     doc.y = doc.y + 14;
     
     let statusColor = "#10B981";
@@ -204,7 +214,8 @@ export function generatePredictionPdf(report: IPredictionResult, res: Response) 
       .font("Helvetica")
       .text(bio.impact, 365, doc.y, { width: 180 });
 
-    doc.y = doc.y + Math.ceil(bio.impact.length / 45) * 6; // adjust row spacing dynamically
+    const impactHeight = doc.heightOfString(bio.impact, { width: 180 });
+    doc.y = doc.y + Math.max(12, impactHeight);
   });
 
   // --- PATHOPHYSIOLOGICAL EXPLANATION ---
@@ -217,15 +228,16 @@ export function generatePredictionPdf(report: IPredictionResult, res: Response) 
 
   doc.moveTo(50, doc.y + 5).lineTo(545, doc.y + 5).strokeColor(lineDivider).lineWidth(0.5).stroke();
 
+  doc.x = 50;
   doc.y = doc.y + 12;
   doc
     .fillColor(darkNavy)
     .font("Helvetica")
     .fontSize(8.5)
-    .text(report.explanation, 50, doc.y, { width: 495, align: "justify", lineGap: 2.5 });
+    .text(report.explanation, { width: 495, align: "justify", lineGap: 2.5 });
 
   // --- PRECAUTIONS SECTION ---
-  doc.y = doc.y + doc.heightOfString(report.explanation, { width: 495 }) + 15;
+  doc.y = doc.y + 15;
   doc
     .fillColor(mutedBlue)
     .font("Helvetica-Bold")
@@ -234,16 +246,14 @@ export function generatePredictionPdf(report: IPredictionResult, res: Response) 
 
   doc.moveTo(50, doc.y + 5).lineTo(545, doc.y + 5).strokeColor(lineDivider).lineWidth(0.5).stroke();
 
+  doc.x = 50;
   doc.y = doc.y + 12;
-  report.precautions.forEach((prec) => {
+  (report.precautions || []).forEach((prec) => {
     doc
       .fillColor(darkNavy)
-      .font("Helvetica-Bold")
-      .fontSize(8.5)
-      .text("• ", 55, doc.y)
       .font("Helvetica")
-      .text(prec, 65, doc.y, { width: 480 });
-    doc.y = doc.y + 12;
+      .fontSize(8.5)
+      .text(`• ${prec}`, { width: 495, paragraphGap: 4 });
   });
 
   // --- DISCLAIMER FOOTER ---

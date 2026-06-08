@@ -199,7 +199,7 @@ app.post("/api/history/clear", async (req, res) => {
   }
 });
 
-// 5. Generate PDF report stream
+// 5. Generate PDF report stream (GET fallback by ID and POST direct payload for static/deployment resilience)
 app.get("/api/reports/pdf/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -210,6 +210,23 @@ app.get("/api/reports/pdf/:id", async (req, res) => {
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename=MediPredict_${id}.pdf`);
+    
+    generatePredictionPdf(record, res);
+  } catch (error) {
+    console.error("PDF generator error:", error);
+    res.status(500).json({ error: "Could not compile PDF binary." });
+  }
+});
+
+app.post("/api/reports/pdf", (req, res) => {
+  try {
+    const record = req.body;
+    if (!record || !record.id) {
+      return res.status(400).json({ error: "Invalid report data provided." });
+    }
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename=MediPredict_${record.id}.pdf`);
     
     generatePredictionPdf(record, res);
   } catch (error) {
