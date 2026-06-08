@@ -1,5 +1,64 @@
 [
   {
+    "id": "report-1780941481836",
+    "date": "2026-06-08T17:58:01.836Z",
+    "patientName": "edu.comtest",
+    "patientEmail": "edu.comtest@example.com",
+    "patientDetails": {
+      "age": "54",
+      "gender": "Male",
+      "weight": "78",
+      "height": "174",
+      "bloodPressure": "135/88",
+      "glucose": "142",
+      "cholesterol": "215",
+      "symptoms": [
+        "Chronic Fatigue",
+        "Frequent Urination"
+      ],
+      "symptomsDescription": "",
+      "customSymptoms": []
+    },
+    "diseaseName": "Diabetes Assessment",
+    "riskPercentage": 82,
+    "confidenceScore": 92,
+    "severityIndicator": "Medium Risk",
+    "explanation": "Based on the patient's symptoms, biomarkers, and health metrics, the most likely disease condition is Diabetes. The presence of chronic fatigue and frequent urination are common symptoms of diabetes due to the body's inability to regulate blood sugar levels effectively. Elevated blood glucose levels (142 mg/dL) further support this assessment. The biological mechanism underlying this risk involves the pancreas's reduced ability to produce insulin, a hormone crucial for glucose uptake by cells. As a result, glucose accumulates in the blood, leading to hyperglycemia. Age, being 54, and elevated serum cholesterol levels (215 mg/dL) also contribute to the risk, as they can lead to insulin resistance. Blood pressure (135/88) is slightly elevated, which can be associated with diabetes due to the potential for kidney damage over time. It is essential to note that this assessment is based on provided data and does not replace a healthcare professional's diagnosis. Please consult a doctor for a definitive diagnosis and personalized advice. Standard precautions include maintaining a healthy diet, engaging in regular physical activity, monitoring blood glucose levels regularly, and following any prescribed medication regimen.",
+    "precautions": [
+      "Maintain a balanced diet low in sugar and saturated fats",
+      "Engage in at least 150 minutes of moderate-intensity aerobic exercise per week",
+      "Monitor blood glucose levels as advised by a healthcare provider",
+      "Adhere to any prescribed medication regimen",
+      "Schedule regular check-ups with a healthcare provider to monitor the condition and adjust the treatment plan as necessary"
+    ],
+    "biomarkerAnalysis": [
+      {
+        "name": "Blood Glucose Level",
+        "value": "142 mg/dL",
+        "status": "Elevated",
+        "impact": "Indicates impaired glucose regulation, a hallmark of diabetes. Elevated levels over time can lead to complications such as nerve damage, kidney disease, and vision problems."
+      },
+      {
+        "name": "Serum Cholesterol Level",
+        "value": "215 mg/dL",
+        "status": "Elevated",
+        "impact": "Contributes to the risk of developing insulin resistance and worsening diabetes control. Elevated cholesterol levels also increase the risk of cardiovascular diseases."
+      },
+      {
+        "name": "Blood Pressure",
+        "value": "135/88",
+        "status": "Slightly Elevated",
+        "impact": "May indicate early signs of hypertension, which is a common comorbidity with diabetes. Elevated blood pressure can exacerbate kidney damage and increase the risk of cardiovascular events."
+      },
+      {
+        "name": "Age",
+        "value": "54 years",
+        "status": "Normal",
+        "impact": "Increases the risk of developing diabetes due to age-related declines in physical activity, potential weight gain, and decreased insulin sensitivity."
+      }
+    ]
+  },
+  {
     "id": "report-1780934473685",
     "date": "2026-06-08T16:01:13.685Z",
     "patientName": "vhhh",

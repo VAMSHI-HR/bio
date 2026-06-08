@@ -80,7 +80,7 @@ export function generatePredictionPdf(report: IPredictionResult, res: Response) 
   const pBp = report.patientDetails?.bloodPressure || "N/A";
   const pGlu = report.patientDetails?.glucose || "N/A";
   const pChol = report.patientDetails?.cholesterol || "N/A";
-  const pSyms = report.patientDetails?.symptoms.join(", ") || "None reported";
+  const pSyms = (report.patientDetails?.symptoms || []).join(", ") || "None reported";
 
   // Grid Layout
   doc
