@@ -26,6 +26,8 @@ export interface PatientInputs {
   glucose: string;
   cholesterol: string;
   symptoms: string[];
+  symptomsDescription?: string;
+  customSymptoms?: string[];
 }
 
 export interface ChatMessage {

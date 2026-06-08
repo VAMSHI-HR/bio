@@ -58,11 +58,13 @@ app.post("/api/predict", async (req, res) => {
     glucose,
     cholesterol,
     symptoms = [],
+    symptomsDescription = "",
+    customSymptoms = [],
     patientName = "",
     patientEmail = ""
   } = req.body;
 
-  const inputs = { age, gender, weight, height, bloodPressure, glucose, cholesterol, symptoms };
+  const inputs = { age, gender, weight, height, bloodPressure, glucose, cholesterol, symptoms, symptomsDescription, customSymptoms };
 
   // Run the rule-based clinical engine first to auto-detect the disease category
   const ruleResult = matchSymptomsAndBiomarkers(inputs, disease);
@@ -80,7 +82,7 @@ app.post("/api/predict", async (req, res) => {
   if (ai) {
     try {
       const targetDiseaseText = (disease === "General" || disease === "Auto-Detect") 
-        ? "Auto-Detect (evaluate the patient's symptoms and vital biomarkers to identify the most likely disease out of 'Diabetes', 'Heart Disease', 'Kidney Disease', 'Liver Disease', or 'Parkinson\'s Disease')" 
+        ? "Auto-Detect (evaluate the patient's symptoms, custom symptoms, and detailed description to identify the most likely disease condition. You are NOT restricted to the original 5 diseases; you may detect other conditions such as Influenza, COVID-19, Asthma, Hypertension, GERD, Migraine, Dehydration, etc.)" 
         : disease;
 
       const prompt = `Analyze the following patient health metrics and symptoms for assessing risk.
@@ -97,20 +99,22 @@ app.post("/api/predict", async (req, res) => {
       - Blood Pressure: ${bloodPressure}
       - Blood Glucose Level: ${glucose} mg/dL
       - Serum Cholesterol Level: ${cholesterol} mg/dL
-      - Symptoms Reported: ${symptoms.length > 0 ? symptoms.join(", ") : "None reported"}
+      - Symptoms Selected: ${symptoms.length > 0 ? symptoms.join(", ") : "None reported"}
+      - Custom Symptoms Added: ${customSymptoms.length > 0 ? customSymptoms.join(", ") : "None reported"}
+      - Detailed Symptoms Description: ${symptomsDescription || "None provided"}
 
-      You are an advanced medical diagnostics expert system. Identify the most likely disease based on symptoms and biomarkers, validate the risk and provide a highly professional, encouraging, and educational clinical explanation outlining the biological mechanism of risk, list actionable precautions, and break down each biomarker (Glucose, Cholesterol, age/vitals) explaining its impact on this specific disease risk.`;
+      You are an advanced medical diagnostics expert system. Identify the most likely disease based on symptoms, custom symptom list, free-text description, and biomarkers. Validate the risk and provide a highly professional, encouraging, and educational clinical explanation outlining the biological mechanism of risk, list actionable precautions, and break down each biomarker (Glucose, Cholesterol, age/vitals) explaining its impact on this specific disease risk.`;
 
       const response = await ai.models.generateContent({
         model: "gemini-3.5-flash",
         contents: prompt,
         config: {
-          systemInstruction: "You are a clinical artificial intelligence diagnostics processor. Analyze indicators and output complete and valid structured clinical reports according to the JSON schema. If the target request is 'Auto-Detect', identify which disease is most relevant: 'Diabetes Assessment', 'Heart Disease Prediction', 'Kidney Disease Prediction', 'Liver Disease Prediction', or 'Parkinson\'s Disease Prediction'. Populate this in the 'diseaseName' output field. Always include standard precautionary disclaimers within the explanation text.",
+          systemInstruction: "You are a clinical artificial intelligence diagnostics processor. Analyze indicators and output complete and valid structured clinical reports according to the JSON schema. If the target request is 'Auto-Detect', identify which disease is most relevant. You are NOT restricted to the five pre-classified diseases; you can detect ANY likely medical condition (e.g. Influenza Assessment, COVID-19 Prediction, Asthma Assessment, Hypertension Assessment, GERD Prediction, Migraine Assessment, Dehydration Assessment, etc.) followed by 'Assessment' or 'Prediction'. Populate this in the 'diseaseName' output field. Always include standard precautionary disclaimers within the explanation text.",
           responseMimeType: "application/json",
           responseSchema: {
             type: Type.OBJECT,
             properties: {
-              diseaseName: { type: Type.STRING, description: "Identified disease name followed by 'Assessment' or 'Prediction', e.g., 'Diabetes Assessment', 'Heart Disease Prediction'" },
+              diseaseName: { type: Type.STRING, description: "Identified disease name followed by 'Assessment' or 'Prediction', e.g., 'Influenza Assessment', 'COVID-19 Prediction'" },
               riskPercentage: { type: Type.INTEGER, description: "Risk value between 5 and 95" },
               confidenceScore: { type: Type.INTEGER, description: "Model diagnostic confidence value between 70 and 99" },
               severityIndicator: { type: Type.STRING, description: "Must be exactly 'Low Risk', 'Medium Risk', or 'High Risk'" },

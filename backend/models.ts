@@ -17,6 +17,8 @@ export interface IPatientDetails {
   glucose: string;
   cholesterol: string;
   symptoms: string[];
+  symptomsDescription?: string;
+  customSymptoms?: string[];
 }
 
 export interface IPredictionResult {
@@ -53,7 +55,9 @@ const PatientDetailsSchema = new Schema<IPatientDetails>({
   bloodPressure: { type: String, required: true },
   glucose: { type: String, required: true },
   cholesterol: { type: String, required: true },
-  symptoms: [{ type: String }]
+  symptoms: [{ type: String }],
+  symptomsDescription: { type: String },
+  customSymptoms: [{ type: String }]
 });
 
 const PredictionSchema = new Schema<IPredictionDocument>({

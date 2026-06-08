@@ -95,6 +95,8 @@ export default function App() {
           glucose: inputs.glucose,
           cholesterol: inputs.cholesterol,
           symptoms: inputs.symptoms,
+          symptomsDescription: inputs.symptomsDescription,
+          customSymptoms: inputs.customSymptoms,
           patientName: patientEmail.split('@')[0],
           patientEmail: patientEmail
         })
@@ -129,8 +131,39 @@ export default function App() {
       // Secondary fallback client calculations
       const gFloat = parseFloat(inputs.glucose) || 100;
       const cFloat = parseFloat(inputs.cholesterol) || 180;
-      const bRisk = gFloat > 140 || cFloat > 240 ? 68 : 28;
       
+      // Extract symptoms
+      const syms = [...inputs.symptoms.map(s => s.toLowerCase())];
+      if (inputs.symptomsDescription) {
+        const descLower = inputs.symptomsDescription.toLowerCase();
+        // Simple client-side extraction helper
+        const keywords: Record<string, string[]> = {
+          fever: ["fever", "temperature", "chills", "feverish"],
+          cough: ["cough", "coughing"],
+          sore_throat: ["sore throat", "throat pain"],
+          body_aches: ["body aches", "muscle pain", "body ache"],
+          runny_nose: ["runny nose", "congestion", "sneezing"],
+          headache: ["headache", "migraine", "head pain"],
+          wheezing: ["wheezing", "wheeze"],
+          chest_tightness: ["chest tightness", "tight chest"],
+          heartburn: ["heartburn", "acid reflux"],
+          dry_mouth: ["dry mouth", "extreme thirst"]
+        };
+        for (const [key, list] of Object.entries(keywords)) {
+          if (list.some(kw => descLower.includes(kw)) && !syms.includes(key)) {
+            syms.push(key);
+          }
+        }
+      }
+      if (inputs.customSymptoms) {
+        inputs.customSymptoms.forEach(cs => {
+          const norm = cs.toLowerCase().trim();
+          if (norm && !syms.includes(norm)) {
+            syms.push(norm);
+          }
+        });
+      }
+
       let predictedDisease = "General Metabolic Syndrome";
       let precautions = [
         "Maintain current fiber nutrition densities.",
@@ -138,8 +171,8 @@ export default function App() {
         "Perform continuous tracking of diastolic blood pressures.",
         "A Hemoglobin A1C blood review should be performed within 45 days."
       ];
+      let bRisk = gFloat > 140 || cFloat > 240 ? 68 : 28;
 
-      const syms = inputs.symptoms.map(s => s.toLowerCase());
       if (syms.some(s => s.includes("urination") || s.includes("thirst") || s.includes("fatigue") || s.includes("polyuria") || s.includes("polydipsia")) || gFloat > 140) {
         predictedDisease = "Diabetes";
         precautions = [
@@ -148,7 +181,8 @@ export default function App() {
           "Engage in daily brisk walking to enhance insulin sensitivity.",
           "Consult an endocrinologist for a comprehensive HbA1c review."
         ];
-      } else if (syms.some(s => s.includes("chest") || s.includes("breath")) || cFloat > 240) {
+        if (gFloat > 125) bRisk = 75;
+      } else if (syms.some(s => s.includes("chest_pain") || s.includes("breath")) || cFloat > 240) {
         predictedDisease = "Heart Disease";
         precautions = [
           "Restrict dietary sodium intake to under 1,500 mg per day.",
@@ -156,6 +190,7 @@ export default function App() {
           "Track resting and active heart rates daily.",
           "Consult a cardiologist for an echocardiogram or stress test."
         ];
+        if (cFloat > 240) bRisk = 80;
       } else if (syms.some(s => s.includes("swelling") || s.includes("edema") || s.includes("kidney"))) {
         predictedDisease = "Kidney Disease";
         precautions = [
@@ -164,6 +199,7 @@ export default function App() {
           "Avoid NSAIDs (like ibuprofen) which can exacerbate renal strain.",
           "Consult a nephrologist to check serum creatinine and eGFR."
         ];
+        bRisk = 55;
       } else if (syms.some(s => s.includes("yellow") || s.includes("jaundice") || s.includes("liver"))) {
         predictedDisease = "Liver Disease";
         precautions = [
@@ -172,6 +208,7 @@ export default function App() {
           "Maintain a moderate weight to decrease visceral fat load.",
           "Consult a hepatologist for liver enzyme panels (ALT/AST)."
         ];
+        bRisk = 65;
       } else if (syms.some(s => s.includes("tremor") || s.includes("stiff") || s.includes("balance") || s.includes("parkinson"))) {
         predictedDisease = "Parkinson's Disease";
         precautions = [
@@ -180,15 +217,72 @@ export default function App() {
           "Ensure a safe home environment to minimize fall risks.",
           "Consult a neurologist specializing in movement disorders."
         ];
+        bRisk = 60;
+      } else if (syms.some(s => s.includes("fever") || s.includes("body_aches") || s.includes("flu") || s.includes("sore_throat"))) {
+        if (syms.some(s => s.includes("taste") || s.includes("smell"))) {
+          predictedDisease = "COVID-19";
+          precautions = [
+            "Isolate immediately to prevent transmission.",
+            "Monitor oxygen levels using a pulse oximeter.",
+            "Rest, stay hydrated, and take fever reducers.",
+            "Seek urgent care if experiencing breathing difficulties."
+          ];
+          bRisk = 70;
+        } else {
+          predictedDisease = "Influenza (Flu)";
+          precautions = [
+            "Get plenty of rest and sleep.",
+            "Stay hydrated by drinking plenty of water, broth, or electrolyte fluids.",
+            "Use over-the-counter fever reducers and pain relievers.",
+            "Avoid contact with others to limit spreading the virus."
+          ];
+          bRisk = 62;
+        }
+      } else if (syms.some(s => s.includes("wheez") || s.includes("asthma") || s.includes("tightness"))) {
+        predictedDisease = "Asthma";
+        precautions = [
+          "Carry your rescue inhaler at all times.",
+          "Identify and avoid triggers (dust, cold air, smoking).",
+          "Ensure proper inhaler technique.",
+          "Have an asthma action plan reviewed by your doctor."
+        ];
+        bRisk = 50;
+      } else if (syms.some(s => s.includes("headache") || s.includes("migraine") || s.includes("light") || s.includes("sound"))) {
+        predictedDisease = "Migraine";
+        precautions = [
+          "Rest in a quiet, dark, and cool room.",
+          "Apply a cold compress to your forehead or neck.",
+          "Stay hydrated and avoid skipped meals.",
+          "Keep a headache diary to identify trigger foods or stressors."
+        ];
+        bRisk = 45;
+      } else if (syms.some(s => s.includes("heartburn") || s.includes("reflux") || s.includes("acid"))) {
+        predictedDisease = "GERD (Acid Reflux)";
+        precautions = [
+          "Avoid lying down for 3 hours after a meal.",
+          "Limit carbonated beverages, caffeine, chocolate, and citrus.",
+          "Eat smaller, more frequent meals.",
+          "Elevate the head of your bed by 6 to 9 inches."
+        ];
+        bRisk = 48;
+      } else if (syms.some(s => s.includes("dry_mouth") || s.includes("dark_urine") || s.includes("dehydrat"))) {
+        predictedDisease = "Dehydration";
+        precautions = [
+          "Drink water or an oral rehydration solution immediately.",
+          "Sip small amounts of fluid frequently rather than gulping.",
+          "Eat water-rich foods like fruits and vegetables.",
+          "Avoid strenuous activity in high temperatures."
+        ];
+        bRisk = 58;
       }
 
       const fallbackReport: PredictionResult = {
         id: `report-${Date.now()}`,
         date: new Date().toISOString(),
-        diseaseName: predictedDisease.endsWith("Assessment") || predictedDisease.endsWith("Prediction") || predictedDisease.endsWith("Syndrome") ? `${predictedDisease}` : `${predictedDisease} Prediction`,
+        diseaseName: predictedDisease.endsWith("Assessment") || predictedDisease.endsWith("Prediction") || predictedDisease.endsWith("Syndrome") || predictedDisease.endsWith("Reflux)") ? `${predictedDisease}` : `${predictedDisease} Prediction`,
         riskPercentage: bRisk,
         confidenceScore: 82,
-        severityIndicator: bRisk > 60 ? "High Risk" : bRisk > 30 ? "Medium Risk" : "Low Risk",
+        severityIndicator: bRisk > 70 ? "High Risk" : bRisk > 35 ? "Medium Risk" : "Low Risk",
         explanation: `This is a simulated review compiled by fallback math engine. Fasting blood glucose is ${inputs.glucose} mg/dL, cholesterol level is ${inputs.cholesterol} mg/dL, and reported symptoms match the profile of ${predictedDisease}. Please configure a valid Gemini API key to enable live AI analysis.`,
         precautions: precautions,
         biomarkerAnalysis: [

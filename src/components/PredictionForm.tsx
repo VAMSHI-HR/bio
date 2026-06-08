@@ -33,12 +33,28 @@ export default function PredictionForm({
   const [glucose, setGlucose] = useState("142");
   const [cholesterol, setCholesterol] = useState("215");
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>(["fatigue", "polyuria"]);
+  const [symptomsDescription, setSymptomsDescription] = useState("");
+  const [customSymptoms, setCustomSymptoms] = useState<string[]>([]);
+  const [customSymptomInput, setCustomSymptomInput] = useState("");
 
   // Multi-select toggle
   const toggleSymptom = (id: string) => {
     setSelectedSymptoms(prev => 
       prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
     );
+  };
+
+  const handleAddCustomSymptom = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const cleanInput = customSymptomInput.trim();
+    if (cleanInput && !customSymptoms.includes(cleanInput)) {
+      setCustomSymptoms(prev => [...prev, cleanInput]);
+      setCustomSymptomInput("");
+    }
+  };
+
+  const handleRemoveCustomSymptom = (symptom: string) => {
+    setCustomSymptoms(prev => prev.filter(s => s !== symptom));
   };
 
   const handleAutofill = (presetType: string) => {
@@ -51,6 +67,8 @@ export default function PredictionForm({
       setGlucose("168");
       setCholesterol("195");
       setSelectedSymptoms(["polyuria", "fatigue", "polydipsia"]);
+      setSymptomsDescription("Frequent urination and increased thirst over the past few weeks, accompanied by fatigue.");
+      setCustomSymptoms([]);
     } else if (presetType === "heart") {
       setAge("62");
       setGender("Male");
@@ -60,6 +78,8 @@ export default function PredictionForm({
       setGlucose("105");
       setCholesterol("268");
       setSelectedSymptoms(["chest_pain", "shortness_breath", "fatigue"]);
+      setSymptomsDescription("Chest tightness and shortness of breath when walking. High cholesterol levels.");
+      setCustomSymptoms([]);
     } else if (presetType === "kidney") {
       setAge("58");
       setGender("Female");
@@ -69,6 +89,8 @@ export default function PredictionForm({
       setGlucose("130");
       setCholesterol("210");
       setSelectedSymptoms(["swelling", "nausea", "fatigue"]);
+      setSymptomsDescription("Persistent swelling in the ankles and feet, feeling nauseous and tired.");
+      setCustomSymptoms([]);
     } else if (presetType === "liver") {
       setAge("45");
       setGender("Male");
@@ -78,6 +100,8 @@ export default function PredictionForm({
       setGlucose("112");
       setCholesterol("225");
       setSelectedSymptoms(["jaundice", "abdominal_pain", "nausea"]);
+      setSymptomsDescription("Yellowish eyes and skin, upper abdominal pain, and nausea after meals.");
+      setCustomSymptoms([]);
     } else if (presetType === "parkinsons") {
       setAge("68");
       setGender("Male");
@@ -87,6 +111,8 @@ export default function PredictionForm({
       setGlucose("92");
       setCholesterol("188");
       setSelectedSymptoms(["tremors", "stiffness", "balance"]);
+      setSymptomsDescription("Hand tremors at rest and muscle stiffness making movement slower.");
+      setCustomSymptoms([]);
     }
   };
 
@@ -103,7 +129,9 @@ export default function PredictionForm({
       symptoms: selectedSymptoms.map(id => {
         const item = SYMPTOMS_LIST.find(s => s.id === id);
         return item ? item.label : id;
-      })
+      }),
+      symptomsDescription,
+      customSymptoms
     });
   };
 
@@ -338,6 +366,80 @@ export default function PredictionForm({
                 })}
               </div>
               <span className="text-[10.5px] text-slate-400 block">Select all symptoms currently being monitored or reported.</span>
+            </div>
+
+            {/* 4. Custom Symptoms & Detailed Description */}
+            <div className="space-y-4">
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block border-b border-slate-100 dark:border-slate-800 pb-2">4. Custom Symptoms & Detailed Description</label>
+              
+              <div className="space-y-4">
+                {/* Free-text Description */}
+                <div className="space-y-1.5">
+                  <span className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                    Describe what symptoms you are experiencing in detail:
+                  </span>
+                  <textarea
+                    id="input-symptoms-description"
+                    rows={3}
+                    placeholder="E.g., I've been experiencing a sudden high fever, mild dry cough, sore throat, and severe body aches for the last two days."
+                    value={symptomsDescription}
+                    onChange={(e) => setSymptomsDescription(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                  <span className="text-[10px] text-slate-400 block font-normal">Our system will parse your description to identify critical symptom matches.</span>
+                </div>
+
+                {/* Custom tags input */}
+                <div className="space-y-2">
+                  <span className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                    Add other specific symptoms (Custom Tags):
+                  </span>
+                  <div className="flex gap-2">
+                    <input
+                      id="input-custom-symptom"
+                      type="text"
+                      placeholder="Type a symptom (e.g. runny nose, headache) and press Add"
+                      value={customSymptomInput}
+                      onChange={(e) => setCustomSymptomInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddCustomSymptom();
+                        }
+                      }}
+                      className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleAddCustomSymptom()}
+                      className="px-4 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition duration-150 cursor-pointer"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  
+                  {customSymptoms.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2 p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 rounded-2xl">
+                      {customSymptoms.map((symptom) => (
+                        <span
+                          key={symptom}
+                          className="flex items-center gap-1.5 px-3 py-1 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-full text-xs font-semibold"
+                        >
+                          {symptom}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveCustomSymptom(symptom)}
+                            className="w-4 h-4 rounded-full bg-slate-300 dark:bg-slate-700 flex items-center justify-center text-[10px] hover:bg-rose-500 hover:text-white transition cursor-pointer"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <span className="text-[10px] text-slate-400 block font-normal">Add any custom signs you're having to include them in the diagnostic report.</span>
+                </div>
+              </div>
             </div>
 
             {/* Submit Action */}
