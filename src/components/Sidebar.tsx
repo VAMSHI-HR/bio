@@ -37,7 +37,7 @@ export default function Sidebar({
     { id: "prediction", label: "Diagnostics Form", desc: "Biomarker Input", icon: Stethoscope },
     { id: "analytics", label: "Health Analytics", desc: "Visual Trends", icon: BarChart2 },
     { id: "history", label: "Saved Reports", desc: "Your History", icon: History },
-    { id: "contacts", label: "Helpline & Tips", desc: "Emergency Care", icon: Contact },
+    { id: "contacts", label: "Health Tips", desc: "Lifestyle Advice", icon: Contact },
   ];
 
   return (

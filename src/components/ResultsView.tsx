@@ -68,49 +68,12 @@ export default function ResultsView({ report, onBackToForm }: ResultsViewProps) 
 
   // Create downloadable TXT report
   const handleDownloadReport = () => {
-    const divider = "=========================================================";
-    const bulletList = report.precautions.map(p => `  • ${p}`).join("\n");
-    const biomarkers = report.biomarkerAnalysis.map(b => `  - ${b.name}: ${b.value} [${b.status}] -> Impact: ${b.impact}`).join("\n");
-
-    const textOutput = `
-${divider}
-              MEDIPREDICT AI DIAGNOSTIC REPORT
-               COLLEGE LAB CLINICAL SIMULATION
-${divider}
-Report ID: ${report.id}
-Timestamp: ${new Date(report.date).toLocaleString()}
-Subject Target: ${report.diseaseName}
-Severity Level: ${report.severityIndicator.toUpperCase()}
-Risk Calculated: ${report.riskPercentage}%
-AI Confidence Rank: ${report.confidenceScore}%
-
-${divider}
-BIO-MARKERS CRITERIA ANALYSIS:
-${biomarkers}
-
-${divider}
-CLINICAL PATHOPHYSIOLOGICAL EXPLANATION:
-${report.explanation}
-
-${divider}
-RECOMMENDED PRECAUTIONARY LIFESTYLE STEPS:
-${bulletList}
-
-${divider}
-DISCLAIMER: For simulation training and study presentation only.
-          Not a substitute for certified clinical advice.
-${divider}
-`;
-    
-    const blob = new Blob([textOutput], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `MediPredict_Report_${report.id}.txt`);
+    link.href = `/api/reports/pdf/${report.id}`;
+    link.setAttribute("download", `MediPredict_Report_${report.id}.pdf`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(url);
   };
 
   return (
@@ -227,7 +190,7 @@ ${divider}
                   onClick={handleDownloadReport}
                   className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-sky-600 text-white font-extrabold py-3 rounded-xl hover:from-blue-700 hover:to-sky-700 transition duration-150 text-xs shadow-md shadow-blue-500/10 cursor-pointer"
                 >
-                  <Download className="w-4 h-4" /> Download Report (.txt)
+                  <Download className="w-4 h-4" /> Download PDF Report
                 </button>
                 <span className="text-[10px] text-center block text-slate-400 dark:text-slate-500">Includes secure parameters mapping checksum</span>
               </div>

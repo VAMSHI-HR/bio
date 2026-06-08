@@ -363,7 +363,7 @@ export default function App() {
                 {activeTab === "prediction" ? "Symptom Predictor" : 
                  activeTab === "results" ? "Calculation Output" : 
                  activeTab === "analytics" ? "Cohort Trends" : 
-                 activeTab === "history" ? "Stored Reports Ledger" : "Vascular Helpline"}
+                 activeTab === "history" ? "Stored Reports Ledger" : "Preventative Health Tips"}
               </h2>
             </div>
           </div>
@@ -561,7 +561,7 @@ export default function App() {
             </div>
           )}
 
-          {/* TAB 6: Helpline Contacts, Tips & Emergency Information */}
+          {/* TAB 6: Preventative Health Tips Only */}
           {activeTab === "contacts" && (
             <div id="tab-contacts" className="space-y-8 animate-in fade-in duration-200">
               
@@ -581,30 +581,6 @@ export default function App() {
                         <span className="text-[10px] font-extrabold text-blue-500 uppercase tracking-wider">{tip.category}</span>
                         <h4 className="font-bold text-sm text-slate-800 dark:text-white">{tip.title}</h4>
                         <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-1">{tip.text}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Emergency grid */}
-              <div className="space-y-4">
-                <h3 className="font-extrabold text-sm text-slate-500 dark:text-slate-400 uppercase tracking-widest block">Emergency Helpdesk Contacts</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {EMERGENCY_CONTACTS.map((c, index) => (
-                    <div 
-                      key={index} 
-                      className="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800 p-6 rounded-3xl shadow-sm flex items-center justify-between gap-4"
-                    >
-                      <div className="flex items-center gap-3.5">
-                        <div className="bg-rose-50 dark:bg-rose-950 text-rose-500 p-3 rounded-2xl shrink-0">
-                          <PhoneCall className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-sm text-slate-800 dark:text-white">{c.region}</h4>
-                          <span className="text-xs font-extrabold text-rose-500 mt-1 block">{c.contact}</span>
-                          <p className="text-[10.5px] text-slate-400 mt-1">{c.desc}</p>
-                        </div>
                       </div>
                     </div>
                   ))}
