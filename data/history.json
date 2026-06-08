@@ -1,0 +1,208 @@
+[
+  {
+    "id": "report-1780934473685",
+    "date": "2026-06-08T16:01:13.685Z",
+    "patientName": "vhhh",
+    "patientEmail": "vhhh@gmail.com",
+    "patientDetails": {
+      "age": "54",
+      "gender": "Male",
+      "weight": "78",
+      "height": "174",
+      "bloodPressure": "135/88",
+      "glucose": "142",
+      "cholesterol": "215",
+      "symptoms": [
+        "Chronic Fatigue",
+        "Frequent Urination",
+        "Muscle Stiffness",
+        "Tremors in resting hands"
+      ]
+    },
+    "diseaseName": "Diabetes Assessment",
+    "riskPercentage": 45,
+    "confidenceScore": 92,
+    "severityIndicator": "Medium Risk",
+    "explanation": "Based on rule-based algorithmic screening for Diabetes. The patient presents a fasting glucose of 142 mg/dL. This level falls within the clinical diabetes threshold (>125 mg/dL). Symptom burden is calculated at none.\n\nDISCLAIMER: This assessment is computed by a clinical rules engine for diagnostic training and study presentation. It does not replace a professional diagnostic assay.",
+    "precautions": [
+      "Monitor blood glucose levels daily before meals.",
+      "Restrict simple carbohydrate intakes and sugar-sweetened beverages.",
+      "Engage in daily brisk walking to enhance insulin sensitivity.",
+      "Consult an endocrinologist for a comprehensive HbA1c review."
+    ],
+    "biomarkerAnalysis": [
+      {
+        "name": "Blood Glucose Level",
+        "value": "142 mg/dL",
+        "status": "Abnormal",
+        "impact": "Direct indicator of critical endocrine glycemic load."
+      },
+      {
+        "name": "Glycemic Symptom Load",
+        "value": "0 Symptoms",
+        "status": "Normal",
+        "impact": "Clinical complaints suggest cellular starvation due to lack of glucose uptake."
+      },
+      {
+        "name": "Body Mass Index Baseline",
+        "value": "78 kg / 174 cm",
+        "status": "Normal",
+        "impact": "Establishes basic physiological metabolism rate index."
+      }
+    ]
+  },
+  {
+    "id": "report-1780934426277",
+    "date": "2026-06-08T16:00:26.277Z",
+    "patientName": "vhhh",
+    "patientEmail": "vhhh@gmail.com",
+    "patientDetails": {
+      "age": "54",
+      "gender": "Male",
+      "weight": "78",
+      "height": "174",
+      "bloodPressure": "135/88",
+      "glucose": "142",
+      "cholesterol": "215",
+      "symptoms": [
+        "Chronic Fatigue",
+        "Frequent Urination",
+        "Chest Pain / Tightness",
+        "Shortness of Breath"
+      ]
+    },
+    "diseaseName": "Diabetes Assessment",
+    "riskPercentage": 45,
+    "confidenceScore": 90,
+    "severityIndicator": "Medium Risk",
+    "explanation": "Based on rule-based algorithmic screening for Diabetes. The patient presents a fasting glucose of 142 mg/dL. This level falls within the clinical diabetes threshold (>125 mg/dL). Symptom burden is calculated at none.\n\nDISCLAIMER: This assessment is computed by a clinical rules engine for diagnostic training and study presentation. It does not replace a professional diagnostic assay.",
+    "precautions": [
+      "Monitor blood glucose levels daily before meals.",
+      "Restrict simple carbohydrate intakes and sugar-sweetened beverages.",
+      "Engage in daily brisk walking to enhance insulin sensitivity.",
+      "Consult an endocrinologist for a comprehensive HbA1c review."
+    ],
+    "biomarkerAnalysis": [
+      {
+        "name": "Blood Glucose Level",
+        "value": "142 mg/dL",
+        "status": "Abnormal",
+        "impact": "Direct indicator of critical endocrine glycemic load."
+      },
+      {
+        "name": "Glycemic Symptom Load",
+        "value": "0 Symptoms",
+        "status": "Normal",
+        "impact": "Clinical complaints suggest cellular starvation due to lack of glucose uptake."
+      },
+      {
+        "name": "Body Mass Index Baseline",
+        "value": "78 kg / 174 cm",
+        "status": "Normal",
+        "impact": "Establishes basic physiological metabolism rate index."
+      }
+    ]
+  },
+  {
+    "id": "report-1780933193727",
+    "date": "2026-06-08T15:39:53.727Z",
+    "patientName": "doctor",
+    "patientEmail": "doctor@medipredict.com",
+    "patientDetails": {
+      "age": "48",
+      "gender": "Female",
+      "weight": "82",
+      "height": "165",
+      "bloodPressure": "128/84",
+      "glucose": "168",
+      "cholesterol": "195",
+      "symptoms": [
+        "Frequent Urination",
+        "Chronic Fatigue",
+        "Excessive Thirst"
+      ]
+    },
+    "diseaseName": "Diabetes Assessment",
+    "riskPercentage": 45,
+    "confidenceScore": 87,
+    "severityIndicator": "Medium Risk",
+    "explanation": "Based on rule-based algorithmic screening for Diabetes. The patient presents a fasting glucose of 168 mg/dL. This level falls within the clinical diabetes threshold (>125 mg/dL). Symptom burden is calculated at none.\n\nDISCLAIMER: This assessment is computed by a clinical rules engine for diagnostic training and study presentation. It does not replace a professional diagnostic assay.",
+    "precautions": [
+      "Monitor blood glucose levels daily before meals.",
+      "Restrict simple carbohydrate intakes and sugar-sweetened beverages.",
+      "Engage in daily brisk walking to enhance insulin sensitivity.",
+      "Consult an endocrinologist for a comprehensive HbA1c review."
+    ],
+    "biomarkerAnalysis": [
+      {
+        "name": "Blood Glucose Level",
+        "value": "168 mg/dL",
+        "status": "Abnormal",
+        "impact": "Direct indicator of critical endocrine glycemic load."
+      },
+      {
+        "name": "Glycemic Symptom Load",
+        "value": "0 Symptoms",
+        "status": "Normal",
+        "impact": "Clinical complaints suggest cellular starvation due to lack of glucose uptake."
+      },
+      {
+        "name": "Body Mass Index Baseline",
+        "value": "82 kg / 165 cm",
+        "status": "Normal",
+        "impact": "Establishes basic physiological metabolism rate index."
+      }
+    ]
+  },
+  {
+    "id": "report-1780932370650",
+    "date": "2026-06-08T15:26:10.650Z",
+    "patientName": "doctor",
+    "patientEmail": "doctor@medipredict.com",
+    "patientDetails": {
+      "age": "48",
+      "gender": "Female",
+      "weight": "82",
+      "height": "165",
+      "bloodPressure": "128/84",
+      "glucose": "168",
+      "cholesterol": "195",
+      "symptoms": [
+        "Frequent Urination",
+        "Chronic Fatigue",
+        "Excessive Thirst"
+      ]
+    },
+    "diseaseName": "Diabetes Assessment",
+    "riskPercentage": 45,
+    "confidenceScore": 93,
+    "severityIndicator": "Medium Risk",
+    "explanation": "Based on rule-based algorithmic screening for Diabetes. The patient presents a fasting glucose of 168 mg/dL. This level falls within the clinical diabetes threshold (>125 mg/dL). Symptom burden is calculated at none.\n\nDISCLAIMER: This assessment is computed by a clinical rules engine for diagnostic training and study presentation. It does not replace a professional diagnostic assay.",
+    "precautions": [
+      "Monitor blood glucose levels daily before meals.",
+      "Restrict simple carbohydrate intakes and sugar-sweetened beverages.",
+      "Engage in daily brisk walking to enhance insulin sensitivity.",
+      "Consult an endocrinologist for a comprehensive HbA1c review."
+    ],
+    "biomarkerAnalysis": [
+      {
+        "name": "Blood Glucose Level",
+        "value": "168 mg/dL",
+        "status": "Abnormal",
+        "impact": "Direct indicator of critical endocrine glycemic load."
+      },
+      {
+        "name": "Glycemic Symptom Load",
+        "value": "0 Symptoms",
+        "status": "Normal",
+        "impact": "Clinical complaints suggest cellular starvation due to lack of glucose uptake."
+      },
+      {
+        "name": "Body Mass Index Baseline",
+        "value": "82 kg / 165 cm",
+        "status": "Normal",
+        "impact": "Establishes basic physiological metabolism rate index."
+      }
+    ]
+  }
+]

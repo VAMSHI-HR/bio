@@ -1,0 +1,6 @@
+{
+  "name": "Multi-Disease Prediction System",
+  "description": "An AI-powered comprehensive diagnostics application that simulates health parameters and symptoms to evaluate risk indexes of multiple medical conditions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
